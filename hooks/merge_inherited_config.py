@@ -15,6 +15,8 @@
 #         hooks:
 #             - hooks/local_override.py
 #             - hooks/local_override2.py
+#         not_in_nav:
+#             - gitignore_style/path/to/exclude
 #         theme_features:
 #             - theme.feature1
 #             - theme.feature2
@@ -22,9 +24,11 @@
 
 import os
 
+from pathspec.gitignore import GitIgnoreSpec
+
 import mkdocs
 from mkdocs.config.defaults import MkDocsConfig
-from mkdocs.config.config_options import (File, FilesystemObject, Hooks, ListOfItems)
+from mkdocs.config.config_options import (File, FilesystemObject, Hooks, ListOfItems, PathSpec)
 from mkdocs.structure.files import (File as FileStructure, Files)
 
 # Load any local files into mkdocs
@@ -48,6 +52,12 @@ def merge_local_hooks(config: MkDocsConfig, hooks: list[str]):
 
     for name, path in zip(hooks, paths):
         config.plugins[name] = Hooks._load_hook(mkdocs, name, path)
+
+# Handle multiple "not in nav" entries
+# These are of a pathspec.gitignore.GitIgnoreSpec format and need to be converted to a multiline string
+def merge_local_not_in_nav(config: MkDocsConfig, not_in_nav: list[GitIgnoreSpec]):
+    nav_str = "\n".join(not_in_nav)
+    config["not_in_nav"] += PathSpec().run_validation(nav_str)
 
 # Add additional theme_override folder
 def merge_local_theme_override(config: MkDocsConfig, custom_dir: str):
@@ -99,6 +109,10 @@ def on_config(config: MkDocsConfig):
         if "extra_javascript" in extra_overrides:
             extra_javascript = extra_overrides["extra_javascript"]
             config.extra_javascript.extend(extra_javascript)
+
+        if "not_in_nav" in extra_overrides:
+            not_in_nav = extra_overrides["not_in_nav"]
+            merge_local_not_in_nav(config, not_in_nav)
 
         if "theme_features" in extra_overrides:
             theme_features = extra_overrides["theme_features"]
