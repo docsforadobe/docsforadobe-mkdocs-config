@@ -28,7 +28,7 @@ from mkdocs.config.config_options import (File, FilesystemObject, Hooks, ListOfI
 from mkdocs.structure.files import (File as FileStructure, Files)
 
 # Load any local files into mkdocs
-def append_local_files(files: Files, config: MkDocsConfig, local_files: list):
+def append_local_files(files: Files, config: MkDocsConfig, local_files: list[str]):
     for local_file_path in local_files:
         local_file = FileStructure(
             path= local_file_path,
@@ -40,7 +40,7 @@ def append_local_files(files: Files, config: MkDocsConfig, local_files: list):
         files.append(local_file)
 
 # Load any override hooks
-def merge_local_hooks(config: MkDocsConfig, hooks: list):
+def merge_local_hooks(config: MkDocsConfig, hooks: list[str]):
     try:
         paths = ListOfItems(File(exists=True)).validate(hooks)
     except Exception as e:
@@ -59,7 +59,7 @@ def merge_local_theme_override(config: MkDocsConfig, custom_dir: str):
     config.theme.dirs.insert(1, local_override_path)
 
 # Load any override theme features
-def merge_local_theme_features(config: MkDocsConfig, theme_features: list):
+def merge_local_theme_features(config: MkDocsConfig, theme_features: list[str]):
     for local_feature in theme_features:
         config.theme["features"].append(local_feature)
 
