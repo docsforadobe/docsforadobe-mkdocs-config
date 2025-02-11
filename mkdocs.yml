@@ -57,6 +57,7 @@ theme:
         - announce.dismiss
         - content.action.edit
         - content.action.view
+        - content.code.copy
         - search.highlight
         - search.suggest
         - toc.follow
